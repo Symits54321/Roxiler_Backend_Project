@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.get('/initialize',productcontroller.seedData); // fetch the JSON from the third party API and initialize the database
 
-//  router.get('/transaction',productcontroller.transaction); // to get transaction
+  router.get('/transaction',productcontroller.transaction); // to get transaction
 
 //  router.get('/statistics',productcontroller.statistics); // to get statistics
 

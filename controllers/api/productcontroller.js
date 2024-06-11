@@ -59,13 +59,151 @@ module.exports.seedData = async function (req, res) {
         console.error('Error in seeding product:', error);
         res.status(500).json({
             message:'Error in seeding product ',
-           
+            error:error.message|| error
         });
    }    
    
 }
 
 
+// transaction Function  :- to get all products data (accord: month, search , page query)
+
+module.exports.transaction = async function (req, res){
+
+    try {
+        
+   
+
+        let searchedText = req.query.search; // type:string
+        let month = req.query.month; //type:number
+        let page = req.query.page;  //type:number
+
+        let transactionArray = await productModel.find({});
+
+
+        // filter by month
+        if(month>0 && month<13){
+            transactionArray = await transactionArray.filter(transc => transc.dateOfSale.getMonth() === month - 1);
+        }else if(month==0){
+            //do nothing i.e. show all products
+        }else{
+            res.status(400).json({
+                message:'Error in month ',
+                usage:'please use month as number (1-12)  if 0 then full data is shown'
+                
+            });
+        }
+
+
+    //filter by searched text
+
+        if(searchedText != ""){
+              
+            let text = searchedText.toLowerCase();
+            console.log(text);
+
+            // 
+
+            let searchresults=[];
+
+            if(!isNaN(parseFloat(searchedText))){
+
+                searchresults = searchresults.concat( transactionArray.filter(transc =>
+                    Math.floor(transc.price)==parseFloat(text)
+                ))
+            }else{
+
+            searchresults = searchresults.concat( transactionArray.filter(transc =>
+                transc.title.toLowerCase().startsWith(text) 
+            ))
+
+            searchresults = searchresults.concat( transactionArray.filter(transc =>
+                transc.title.toLowerCase().includes(text) 
+            ))
+
+            searchresults = searchresults.concat( transactionArray.filter(transc =>
+                transc.description.toLowerCase().includes(text)
+            ))
+
+            searchresults = searchresults.concat( transactionArray.filter(transc =>
+                transc.category.toLowerCase().includes(text) 
+            ))
+
+          }
+            
+           
+
+           
+            transactionArray = await searchresults;
+
+        }
+
+
+        
+    // get total pages
+
+        let totalProducts = transactionArray.length;
+        let totalPage=1;
+        
+        if(totalProducts>10){
+            totalPage = Math.floor(totalProducts/10);
+            if(totalProducts%10!=0){
+                totalPage++;
+            }
+        }
+        
+
+     // filter by page no.
+
+           // 
+           if(page<1 || page> totalPage) {
+               
+            res.status(400).json({
+                message:'Error in page value ',
+                usage:'page value must start with 1  and max value of total page only',
+                totalpage:totalPage
+            });
+
+           }
+           
+          // setting start and end index
+            let si = (page-1)*10;
+            let ei = page*10;
+            if(totalProducts<page*10){
+                ei = totalProducts;
+            }
+
+           //slicing the transaction array to get particular page array
+           
+           transactionArray = transactionArray.slice(si,ei);
+
+
+                return(
+                    res.status(200).json({
+                        message:'succesfully got transaction data',
+                        data:{
+                            page:page,
+                            totalPage:totalPage,
+                            totalProducts:totalProducts,
+                            products:transactionArray
+                        }
+                    })
+                )
+
+
+
+    } catch (error) {
+        console.error('Error in getting transaction:', error);
+        res.status(500).json({
+            message:'Error in getting transaction ',
+            error:error.message|| error
+            
+        });
+    }
+        
+    
+
+}
 
 
 
