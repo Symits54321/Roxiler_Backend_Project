@@ -5,7 +5,7 @@ const productModel= require ('../../model/product_model');
 // Functions
 
 
-// seedData Function   :- to seed data  -> to get all products -------------------------------------------------------------------
+// SeedData Function   :- to seed data  -> to get all products -------------------------------------------------------------------
 module.exports.seedData = async function (req, res) {
   
     try {                                          // using try and catch
@@ -66,7 +66,10 @@ module.exports.seedData = async function (req, res) {
 }
 
 
-// transaction Function  :- to get all products data (accord: month, search , page query)
+
+
+
+// Transaction Function  :- to get all products data (accord: month, search , page query)
 
 module.exports.transaction = async function (req, res){
 
@@ -204,6 +207,67 @@ module.exports.transaction = async function (req, res){
     
 
 }
+
+
+// PieChart Function :-  to get picechart of products in a particular month
+module.exports.piechart = async function (req,res){
+
+ 
+ try {
+    
+
+
+    let month = req.query.month;
+
+    let piechartdata = await productModel.find({});
+    
+    piechartdata = piechartdata.filter(x => x.dateOfSale.getMonth() === month - 1);
+    
+    let hashmap={};
+
+    piechartdata.forEach((x)=>{
+         
+          if (hashmap[x.category]){
+             // if contains x.category then increase its value
+             hashmap[x.category]++         
+          }else{
+           // else create key of category name and value as 1
+             hashmap[x.category] = 1;
+          }
+    })
+
+
+    return(
+        res.status(200).json({
+            message:'succesfully got piechart data',
+            data:{
+                month:month,
+                data:hashmap
+
+            }
+        })
+    )
+
+
+
+
+
+
+ } catch (error) {
+
+    console.error('Error in getting transaction:', error);
+    res.status(500).json({
+        message:'Error in getting piechart ',
+        error:error.message|| error
+        
+    });
+    
+ }
+
+}
+
+
+
 
 
 

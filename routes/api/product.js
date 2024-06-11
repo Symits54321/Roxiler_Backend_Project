@@ -13,7 +13,7 @@ router.get('/initialize',productcontroller.seedData); // fetch the JSON from the
 
 //  router.get('/barchart',productcontroller.barchart); // to get barchart
 
-//  router.get('/piechart/:id',productcontroller.piechart); // to get piechart
+router.get('/piechart',productcontroller.piechart); // to get piechart
 
 //  router.get('/statistics+barchart+piechart',productcontroller.fullStatData); // to get statistics+barchart+piechart
 
