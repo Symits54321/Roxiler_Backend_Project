@@ -9,11 +9,11 @@ router.get('/initialize',productcontroller.seedData); // fetch the JSON from the
 
   router.get('/transaction',productcontroller.transaction); // to get transaction
 
-//  router.get('/statistics',productcontroller.statistics); // to get statistics
+  router.get('/statistics',productcontroller.statistics); // to get statistics
 
-//  router.get('/barchart',productcontroller.barchart); // to get barchart
+  router.get('/barchart',productcontroller.barchart); // to get barchart
 
-router.get('/piechart',productcontroller.piechart); // to get piechart
+  router.get('/piechart',productcontroller.piechart); // to get piechart
 
 //  router.get('/statistics+barchart+piechart',productcontroller.fullStatData); // to get statistics+barchart+piechart
 

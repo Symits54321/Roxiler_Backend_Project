@@ -209,6 +209,8 @@ module.exports.transaction = async function (req, res){
 }
 
 
+
+
 // PieChart Function :-  to get picechart of products in a particular month
 module.exports.piechart = async function (req,res){
 
@@ -220,8 +222,20 @@ module.exports.piechart = async function (req,res){
     let month = req.query.month;
 
     let piechartdata = await productModel.find({});
+
+    if(month>0 && month<13){
+        piechartdata = piechartdata.filter(x => x.dateOfSale.getMonth() === month - 1);
+    }else if(month==0){
+        //do nothing i.e. show all 
+    }else{
+        res.status(400).json({
+            message:'Error in month ',
+            usage:'please use month as number (1-12)  if 0 then full data is shown'
+            
+        });
+    }
     
-    piechartdata = piechartdata.filter(x => x.dateOfSale.getMonth() === month - 1);
+   
     
     let hashmap={};
 
@@ -267,8 +281,129 @@ module.exports.piechart = async function (req,res){
 }
 
 
+// Statistics Function :- to get statistics data of products in a particular month
+module.exports.statistics = async function (req,res){
+
+  try {
+
+    let month = req.query.month;
 
 
+    let statisticsData = await productModel.find({});
+
+    if(month>0 && month<13){
+        statisticsData = statisticsData.filter(x => x.dateOfSale.getMonth() === month - 1);
+    }else if(month==0){
+        //do nothing i.e. show all 
+    }else{
+        res.status(400).json({
+            message:'Error in month ',
+            usage:'please use month as number (1-12)  if 0 then full data is shown'
+            
+        });
+    }
+
+  
+
+    let totalSale = statisticsData.length ;
+    let sold = statisticsData.filter(x => x.sold == true).length;
+    
+    return(
+        res.status(200).json({
+            message:'succesfully got statistics data',
+            data:{
+                month:month,
+                data:{
+                    totalSale:totalSale,
+                    totalSoldItem:sold,
+                    totalUnsoldItems:totalSale-sold
+                }
+
+            }
+        })
+    )  
+    
+
+ } catch (error) {
+
+    console.error('Error in getting statistics:', error);
+    res.status(500).json({
+        message:'Error in getting statistics ',
+        error:error.message|| error
+        
+    });
+    
+ }
+  
+
+
+}
+
+
+
+// Barchart Function :- to get barchart data of products in a particular month
+module.exports.barchart = async function (req,res){
+
+ try {
+  
+      let month = req.query.month;
+  
+      let barchartData = await productModel.find({});
+      
+     // filter by month
+
+      if(month>0 && month<13){
+        barchartData = barchartData.filter(x => x.dateOfSale.getMonth() === month - 1);
+      }else if(month==0){
+          //do nothing i.e. show all 
+      }else{
+          res.status(400).json({
+              message:'Error in month ',
+              usage:'please use month as number (1-12)  if 0 then full data is shown'
+              
+          });
+      }
+
+     //creating hashmap
+      let hashmap = {};
+
+     //price range data adding through for loop
+      for(i=0; i<9; i++){
+         //bar
+         let totalProductsLength = barchartData.filter(x=>x.price>=(i*100) && x.price<=((i+1)*100)).length;
+         let key = `${i*100} to ${(i+1)*100}`;
+         hashmap[key]=totalProductsLength;
+      }
+
+      hashmap['900 to above']= barchartData.filter(x => x.price >= 900).length;
+      
+
+      return(
+        res.status(200).json({
+            message:'succesfully got BarChart data',
+            data:{
+                month:month,
+                data:hashmap
+
+            }
+        })
+    )  
+    
+
+ } catch (error) {
+
+    console.error('Error in getting Barchart:', error);
+    res.status(500).json({
+        message:'Error in getting Barchart ',
+        error:error.message|| error
+        
+    });
+    
+}
+      
+    
+    
+}
 
 
 
