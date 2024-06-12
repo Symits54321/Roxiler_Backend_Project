@@ -369,7 +369,6 @@ module.exports.barchart = async function (req,res){
 
      //price range data adding through for loop
       for(i=0; i<9; i++){
-         //bar
          let totalProductsLength = barchartData.filter(x=>x.price>=(i*100) && x.price<=((i+1)*100)).length;
          let key = `${i*100} to ${(i+1)*100}`;
          hashmap[key]=totalProductsLength;
